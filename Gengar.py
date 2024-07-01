@@ -64,7 +64,7 @@ st.write("kya puchna he????")
 uploaded_file = st.file_uploader("Choose a PDF file", type="pdf")
 
 if uploaded_file is not None:
-    # Clear chat history when a new PDF is uploaded
+    # Clear chat history and delete JSON file when a new PDF is uploaded
     if "uploaded_file" in st.session_state and st.session_state.uploaded_file != uploaded_file:
         if "chat_history" in st.session_state:
             del st.session_state["chat_history"]
@@ -80,7 +80,6 @@ if uploaded_file is not None:
     # Initialize session state for chat history
     if "chat_history" not in st.session_state:
         st.session_state.chat_history = load_chat_history()
-
 
     # Display chat history
     for role, message in st.session_state.chat_history:
