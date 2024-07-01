@@ -59,7 +59,7 @@ def clear_chat_history(filename="chat_history.json"):
 # Streamlit UI
 st.title("PDF Patola")
 st.write("Chai Piyoge ☕????")
-st.write('Pro tip - "Always use Clean Chat"')
+st.write('Pro tip - always use "clean chat history"')
 
 # File uploader
 uploaded_file = st.file_uploader("Choose a PDF file", type="pdf")
