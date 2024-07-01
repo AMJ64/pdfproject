@@ -40,16 +40,16 @@ def retrieve_relevant_text(pdf_text, query):
     return relevant_text
 
 # Function to save chat history to a file
-def save_chat_history(chat_history, filename="chat_history.json"):
-    with open(filename, "w") as file:
-        json.dump(chat_history, file)
+# def save_chat_history(chat_history, filename="chat_history.json"):
+#     with open(filename, "w") as file:
+#         json.dump(chat_history, file)
 
 # Function to load chat history from a file
-def load_chat_history(filename="chat_history.json"):
-    if os.path.exists(filename):
-        with open(filename, "r") as file:
-            return json.load(file)
-    return []
+# def load_chat_history(filename="chat_history.json"):
+#     if os.path.exists(filename):
+#         with open(filename, "r") as file:
+#             return json.load(file)
+#     return []
 
 # Function to clear chat history
 def clear_chat_history(filename="chat_history.json"):
@@ -81,12 +81,12 @@ if uploaded_file is not None:
 
     # Initialize session state for chat history
     if "chat_history" not in st.session_state:
-        st.session_state.chat_history = load_chat_history()
+        st.session_state.chat_history = []
 
     # Display chat history
     for role, message in st.session_state.chat_history:
         if role == "user":
-            st.write(f"**prompt:** {message}")
+            st.write(f"**you:** {message}")
         else:
             st.write(f"{message}")
 
@@ -119,7 +119,7 @@ if uploaded_file is not None:
             st.session_state.chat_history.append(("assistant", response))
             
             # Save chat history
-            save_chat_history(st.session_state.chat_history)
+            # save_chat_history(st.session_state.chat_history)
             
             # Clear the input box
             st.experimental_rerun()
