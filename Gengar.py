@@ -64,11 +64,12 @@ st.write("kya puchna he????")
 uploaded_file = st.file_uploader("Choose a PDF file", type="pdf")
 
 if uploaded_file is not None:
-    # Clear chat history and delete JSON file when a new PDF is uploaded
+    # Clear chat history, delete JSON file, and clear session state when a new PDF is uploaded
     if "uploaded_file" in st.session_state and st.session_state.uploaded_file != uploaded_file:
         if "chat_history" in st.session_state:
             del st.session_state["chat_history"]
         clear_chat_history()
+        st.session_state.clear()  # Clear all session state data
     
     st.session_state.uploaded_file = uploaded_file
 
