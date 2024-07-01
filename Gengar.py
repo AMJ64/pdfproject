@@ -7,6 +7,7 @@ from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
 import numpy as np
 import json
+import uuid
 
 # Initialize Groq client
 client = Groq(
@@ -40,19 +41,22 @@ def retrieve_relevant_text(pdf_text, query):
     return relevant_text
 
 # Function to save chat history to a file
-# def save_chat_history(chat_history, filename="chat_history.json"):
-#     with open(filename, "w") as file:
-#         json.dump(chat_history, file)
+def save_chat_history(chat_history, session_id):
+    filename = f"chat_history_{session_id}.json"
+    with open(filename, "w") as file:
+        json.dump(chat_history, file)
 
 # Function to load chat history from a file
-# def load_chat_history(filename="chat_history.json"):
-#     if os.path.exists(filename):
-#         with open(filename, "r") as file:
-#             return json.load(file)
-#     return []
+def load_chat_history(session_id):
+    filename = f"chat_history_{session_id}.json"
+    if os.path.exists(filename):
+        with open(filename, "r") as file:
+            return json.load(file)
+    return []
 
 # Function to clear chat history
-def clear_chat_history(filename="chat_history.json"):
+def clear_chat_history(session_id):
+    filename = f"chat_history_{session_id}.json"
     if os.path.exists(filename):
         os.remove(filename)
 
@@ -60,6 +64,12 @@ def clear_chat_history(filename="chat_history.json"):
 st.title("PDF Patola")
 st.write("Chai Piyoge ☕????")
 st.write('Pro tip - always use "clean chat history"')
+
+# Generate a unique session ID for each user
+if "session_id" not in st.session_state:
+    st.session_state.session_id = str(uuid.uuid4())
+
+session_id = st.session_state.session_id
 
 # File uploader
 uploaded_file = st.file_uploader("Choose a PDF file", type="pdf")
@@ -69,8 +79,9 @@ if uploaded_file is not None:
     if "uploaded_file" in st.session_state and st.session_state.uploaded_file != uploaded_file:
         if "chat_history" in st.session_state:
             del st.session_state["chat_history"]
-        clear_chat_history()
+        clear_chat_history(session_id)
         st.session_state.clear()  # Clear all session state data
+        st.session_state.session_id = session_id  # Retain the session ID
     
     st.session_state.uploaded_file = uploaded_file
 
@@ -81,12 +92,12 @@ if uploaded_file is not None:
 
     # Initialize session state for chat history
     if "chat_history" not in st.session_state:
-        st.session_state.chat_history = []
+        st.session_state.chat_history = load_chat_history(session_id)
 
     # Display chat history
     for role, message in st.session_state.chat_history:
         if role == "user":
-            st.write(f"**you:** {message}")
+            st.write(f"**prompt:** {message}")
         else:
             st.write(f"{message}")
 
@@ -103,7 +114,7 @@ if uploaded_file is not None:
                 messages=[
                     {
                         "role": "system",
-                        "content": "You are a helpful assistant. The following is the relevant content of the PDF: " + relevant_text
+                        "content": "You are a helpful assistant. The following is the relevant content of the PDF: " + relevant_text +"act like you are a pdf"
                     },
                     {
                         "role": "user",
@@ -119,7 +130,7 @@ if uploaded_file is not None:
             st.session_state.chat_history.append(("assistant", response))
             
             # Save chat history
-            # save_chat_history(st.session_state.chat_history)
+            save_chat_history(st.session_state.chat_history, session_id)
             
             # Clear the input box
             st.experimental_rerun()
@@ -128,5 +139,5 @@ if uploaded_file is not None:
     if st.button("Clear Chat History"):
         if "chat_history" in st.session_state:
             del st.session_state["chat_history"]
-        clear_chat_history()
+        clear_chat_history(session_id)
         st.experimental_rerun()
